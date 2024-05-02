@@ -1,26 +1,14 @@
-from typing import Union
-
 from fastapi import FastAPI
-from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 
-# from json import dumps,loads
+# Models
+from models.product import Product
+from models.category import Category
 
+# Supabase Connector
 from supabase_config import supabase_client
 
 app = FastAPI()
-
-class Product(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    category: int | None = None
-    userid: str | None = None
-
-class Category(BaseModel):
-    name: str
-    slug: str
-    parent_category:  int | None = None
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page():
@@ -36,12 +24,20 @@ async def home_page():
     """
 
 @app.get("/products")
-def read_products():
-    response = supabase_client.table('products').select("*,categories(name,slug)").execute()
-    return response.data
+def read_products(name: str | None = None,category: int | None = None,price: int = 1, limit: int = 10):
+    response = supabase_client.table('products').select("*,categories(name,slug)")
+    
+    if name != None:
+        response = response.ilike("name",f'%25{name}%25')
+    if category != None:
+        response = response.eq("category",category)
+    if price != None:
+        response = response.gte("price",price)
+
+    return response.limit(limit).execute().data
 
 @app.get("/products/{item_id}")
-def read_product(item_id: int, q: Union[str, None] = None):
+def read_product(item_id: int, ):
     response = supabase_client.table('products').select("*,categories(name,slug)").eq('id', item_id).execute()
     return response.data
 
@@ -52,16 +48,18 @@ def create_product(product: Product):
 
 @app.put("/products/{item_id}")
 def update_product(item_id: int, product: Product):
-    response = supabase_client.table('products').update(dict(product)).eq("id",item_id).execute()
-    return response.data
+    response = supabase_client.table('products').update(dict(product)).eq("id",item_id)
+    return response.execute().data
 
 @app.get("/categories")
-def read_categories():
-    response = supabase_client.table('categories').select("*,categories(name,slug)").execute()
-    return response.data
+def read_categories(name: str | None = None, limit: int = 10):
+    response = supabase_client.table('categories').select("*,categories(name,slug)").limit(limit)
+    if name != None:
+        response = response.ilike("name",f'%25{name}%25')
+    return response.execute().data
 
 @app.get("/categories/{item_id}")
-def read_categories(item_id: int, q: Union[str, None] = None):
+def read_categories(item_id: int):
     response = supabase_client.table('categories').select("*,categories(name,slug)").eq('id', item_id).execute()
     return response.data
 
@@ -81,6 +79,6 @@ def read_categories():
     return response.data
 
 @app.get("/users/{item_id}")
-def read_categories(item_id: int, q: Union[str, None] = None):
+def read_categories(item_id: int, q: str | None = None):
     response = supabase_client.table('categories').select("*,categories(name,slug)").eq('id', item_id).execute()
     return response.data
