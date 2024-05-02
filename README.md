@@ -1,6 +1,6 @@
 # Requirements
 
-  1. [Supabase](https://supabase.com/docs)
+  1. [Supabase](https://supabase.com/docs){:target="_blank"}
   2. Python 3.8+
   3.  venv
   4.  pip
