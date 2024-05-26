@@ -1,8 +1,9 @@
+from typing import Any, Union
 from pydantic import BaseModel
 
 class Product(BaseModel):
     name: str
-    description: str | None = None
+    description: Union[str, None] = None
     price: float
-    category: int | None = None
-    userid: str | None = None
+    category: Union[int, None] = None
+    userid: Union[str, None] = None

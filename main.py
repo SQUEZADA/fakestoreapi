@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from typing import Any, Union
 
 # Models
 from models.product import Product
@@ -24,7 +25,7 @@ async def home_page():
     """
 
 @app.get("/products")
-def read_products(name: str | None = None,category: int | None = None,price: int = 1, limit: int = 10):
+def read_products(name: Union[str, None] = None,category: Union[int, None] = None,price: int = 1, limit: int = 10):
     response = supabase_client.table('products').select("*,categories(name,slug)")
     
     if name != None:
@@ -52,7 +53,7 @@ def update_product(item_id: int, product: Product):
     return response.execute().data
 
 @app.get("/categories")
-def read_categories(name: str | None = None, limit: int = 10):
+def read_categories(name: Union[str, None] = None, limit: int = 10):
     response = supabase_client.table('categories').select("*,categories(name,slug)").limit(limit)
     if name != None:
         response = response.ilike("name",f'%25{name}%25')
@@ -79,6 +80,6 @@ def read_categories():
     return response.data
 
 @app.get("/users/{item_id}")
-def read_categories(item_id: int, q: str | None = None):
+def read_categories(item_id: int, q: Union[str, None] = None):
     response = supabase_client.table('categories').select("*,categories(name,slug)").eq('id', item_id).execute()
     return response.data
