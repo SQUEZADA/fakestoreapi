@@ -1,7 +1,7 @@
 name: hola-mundo
 on: [push]
 jobs:
-	hola-mundo:
+hola-mundo:
 		runs-on: ubuntu-latest
 		steps:
 			- name: Public IP
@@ -9,4 +9,4 @@ jobs:
 				uses: haythem/public-ip@v1.3
       - name: Hola Mundo
         id: print hola mundo
-				run: echo ¡Hola Mundo desde ${{ steps.ip.outputs.ipv4 }}!
+	run: echo ¡Hola Mundo desde ${{ steps.ip.outputs.ipv4 }}!
