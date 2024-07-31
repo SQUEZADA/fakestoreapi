@@ -8,5 +8,5 @@ jobs:
           id: ip
           uses: haythem/public-ip@v1.3
         - name: Hola Mundo
-          id: print hola mundo
+          id: print-hola-mundo
           run: echo ¡Hola Mundo desde ${{ steps.ip.outputs.ipv4 }}!
