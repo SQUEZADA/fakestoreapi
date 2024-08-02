@@ -3,12 +3,10 @@ from fastapi.responses import HTMLResponse
 from typing import List, Any, Union
 
 # Models
-from models.product import Product
-from models.category import Category
-from models.user import User
+from app.models import Product, Category, User, Category_Fields, Product_Fields
 
 # Supabase Connector
-from supabase_config import supabase_client
+from app.config.supabase_config import supabase_client
 
 app = FastAPI()
 
@@ -26,7 +24,7 @@ async def home_page():
     """
 
 @app.get("/products")
-def read_products(product: Product, name: Union[str, None] = None,category: Union[int, None] = None,price: int = 1, limit: int = 10) -> List[Product]:
+def read_products(name: Union[str, None] = None,category: Union[int, None] = None,price: int = 1, limit: int = 10) -> List[Product]:
     response = supabase_client.table('products').select("*,categories(name,slug)")
     
     if name != None:
@@ -38,10 +36,10 @@ def read_products(product: Product, name: Union[str, None] = None,category: Unio
 
     return response.limit(limit).execute().data
 
-@app.get("/products/{item_id}")
-def read_product(item_id: int,product: Product) -> Product:
+@app.get("/products/{item_id}", response_model= Product_Fields)
+def read_product(item_id: int):
     response = supabase_client.table('products').select("*,categories(name,slug)").eq('id', item_id).execute()
-    return response.data
+    return response.data[0]
 
 @app.post("/products")
 def create_product(product: Product) -> Product:
@@ -49,19 +47,19 @@ def create_product(product: Product) -> Product:
     return response.data
 
 @app.put("/products/{item_id}")
-def update_product(item_id: int, product: Product) -> Product:
+def update_product(product: Product_Fields, item_id: int) -> Product:
     response = supabase_client.table('products').update(dict(product)).eq("id",item_id)
     return response.execute().data
 
 @app.get("/categories")
-def read_categories(category: Category, name: Union[str, None] = None, limit: int = 10) -> List[Category]:
+def read_categories(name: Union[str, None] = None, limit: int = 10) -> List[Category]:
     response = supabase_client.table('categories').select("*,categories(name,slug)").limit(limit)
     if name != None:
         response = response.ilike("name",f'%25{name}%25')
     return response.execute().data
 
 @app.get("/categories/{item_id}")
-def read_categories(category: Category,item_id: int) -> Category:
+def read_categories(item_id: int) -> Category:
     response = supabase_client.table('categories').select("*,categories(name,slug)").eq('id', item_id).execute()
     return response.data
 
