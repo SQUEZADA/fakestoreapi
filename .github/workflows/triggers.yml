@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - "main"
+jobs:
+  review-building:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar Repo en el Runner
+        uses: actions/checkout@v4
+      
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Define Variable IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+        
+      - name: Define Variable USERNAME   
+        run: echo "USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+
+      - name: Run multi-line script
+        run: |
+          echo "Hello from IP: ${{ steps.ip.outputs.ipv4 }}"
+          # python hola-mundo.py
