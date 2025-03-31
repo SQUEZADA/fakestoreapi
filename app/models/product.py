@@ -1,21 +1,31 @@
-from typing import Any, Union
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
+from typing import Optional, List
+from .category import Category
 
-class Product(BaseModel):
+class ProductBase(BaseModel):
     name: str
-    description: Union[str, None] = None
-    price: int
-    category: Union[int, None] = None
-    userid: Union[str, None] = None
+    description: str
+    price: float
+    category_id: int
+    stock: int = 0
+    is_active: bool = True
 
-class Product_Fields(Product):
-    id: Union[int, None] = None
-    name: Union[str, None] = None
-    price: Union[int, None] = None
-    created_at: Union[str, None] = None
-    categories: Union[dict, None] = None
+class ProductCreate(ProductBase):
+    pass
 
-try:
-    Product.model_validate('not an object', from_attributes=True)
-except ValidationError as exc:
-    print(repr(exc.errors()[0]['type']))
+class ProductUpdate(ProductBase):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    category_id: Optional[int] = None
+    stock: Optional[int] = None
+    is_active: Optional[bool] = None
+
+class Product(ProductBase):
+    id: int
+    category: Optional[Category] = None
+
+    class Config:
+        from_attributes = True
+
+__all__ = ['Product', 'ProductCreate', 'ProductUpdate', 'ProductBase']
