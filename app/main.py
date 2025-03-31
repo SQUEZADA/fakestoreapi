@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from typing import List, Any, Union
-from app.routers import product_router, category_router, user_router
+from app.routers import product_router, category_router, user_router, auth_router
 
 # Models
 from app.models import Product, Category, User
@@ -15,6 +15,7 @@ app = FastAPI()
 app.include_router(product_router.router)
 app.include_router(category_router.router)
 app.include_router(user_router.router)
+app.include_router(auth_router.router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page():
